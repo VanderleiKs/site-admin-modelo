@@ -3,9 +3,9 @@
   "name": "site-admin-modelo",
   "compatibility_date": "2026-10-07",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "dist/site-admin-modelo/server/index.mjs",
+  "main": "dist/site-ssr/server/index.mjs",
   "assets": {
-    "directory": "dist/site-admin-modelo/browser/",
+    "directory": "dist/site-ssr/browser/",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   }
