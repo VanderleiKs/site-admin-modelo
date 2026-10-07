@@ -15,7 +15,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "site-admin-modelo",
-  "main": "dist/site-ssr/server/index.mjs",
+  "main": "dist/site-ssr/server/server.mjs",
   "compatibility_date": "2026-10-06",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
