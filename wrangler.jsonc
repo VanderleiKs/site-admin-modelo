@@ -3,7 +3,7 @@
   "name": "site-admin-modelo",
   "compatibility_date": "2026-10-07",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "dist/site-ssr/server/index.mjs",
+  "main": "dist/site-ssr/server/server.mjs",
   "assets": {
     "directory": "dist/site-ssr/browser/",
     "binding": "ASSETS",
