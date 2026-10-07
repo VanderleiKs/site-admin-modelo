@@ -37,6 +37,7 @@
     "@angular/build": "^22.2.2",
     "@angular/cli": "^22.2.2",
     "@angular/compiler-cli": "^22.2.0",
+    "@cloudflare/vite-plugin": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/express": "^5.0.1",
     "@types/node": "^24.19.1",
@@ -51,5 +52,5 @@
   "engines": {
     "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
   },
-  "description": "Site institucional + painel administrativo em uma \u00fanica aplica\u00e7\u00e3o Angular SSR (Express + SQLite)."
+  "description": "Site institucional + painel administrativo em uma única aplicação Angular SSR (Express + SQLite)."
 }
