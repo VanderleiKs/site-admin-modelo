@@ -1,0 +1,91 @@
+<a
+  href="#conteudo"
+  class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:shadow"
+>
+  Pular para o conteúdo
+</a>
+<header
+  class="sticky top-0 z-40 border-b border-line/70 bg-paper/90 backdrop-blur supports-[backdrop-filter]:bg-paper/75"
+>
+  <div class="container-site flex h-20 items-center justify-between gap-6">
+    <a routerLink="/" class="shrink-0" aria-label="Página inicial">
+      <app-site-logo />
+    </a>
+
+    <nav aria-label="Navegação principal" class="hidden md:block">
+      <ul class="flex items-center gap-1">
+        @for (item of nav; track item.path) {
+          <li>
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="text-brand after:scale-x-100"
+              [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+              ariaCurrentWhenActive="page"
+              class="relative px-4 py-2 text-sm font-medium text-ink-soft transition hover:text-brand after:absolute after:inset-x-4 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded after:bg-accent after:transition-transform"
+            >
+              {{ item.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      @if (store.whatsappUrl(); as wa) {
+        <a
+          [href]="wa"
+          target="_blank"
+          rel="noopener"
+          class="btn-primary hidden !px-5 !py-2.5 sm:inline-flex"
+        >
+          <app-icon name="whatsapp" [size]="18" /> Fale conosco
+        </a>
+      } @else {
+        <a routerLink="/contato" class="btn-primary hidden !px-5 !py-2.5 sm:inline-flex"
+          >Fale conosco</a
+        >
+      }
+      <button
+        type="button"
+        class="inline-flex h-11 w-11 items-center justify-center rounded-full text-brand hover:bg-brand/5 md:hidden"
+        [attr.aria-expanded]="open()"
+        aria-controls="menu-mobile"
+        (click)="toggle()"
+      >
+        <span class="sr-only">{{ open() ? 'Fechar menu' : 'Abrir menu' }}</span>
+        <app-icon [name]="open() ? 'close' : 'menu'" [size]="24" />
+      </button>
+    </div>
+  </div>
+
+  @if (open()) {
+    <nav
+      id="menu-mobile"
+      aria-label="Navegação principal (celular)"
+      class="animate-fade-up border-t border-line bg-paper md:hidden"
+    >
+      <ul class="container-site flex flex-col py-3">
+        @for (item of nav; track item.path) {
+          <li>
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="text-brand bg-brand/5"
+              [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+              ariaCurrentWhenActive="page"
+              class="block rounded-lg px-3 py-3 font-medium text-ink"
+            >
+              {{ item.label }}
+            </a>
+          </li>
+        }
+        @if (store.whatsappUrl(); as wa) {
+          <li class="pt-2">
+            <a [href]="wa" target="_blank" rel="noopener" class="btn-primary w-full">
+              <app-icon name="whatsapp" [size]="18" /> Pedir pelo WhatsApp
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+  }
+</header>

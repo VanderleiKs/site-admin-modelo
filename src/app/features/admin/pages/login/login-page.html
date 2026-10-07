@@ -1,0 +1,54 @@
+<main class="w-full max-w-sm">
+  <div class="adm-card p-8">
+    <h1 class="font-sans text-xl font-semibold text-stone-900">Entrar no painel</h1>
+    <p class="mt-1 text-sm text-stone-600">Acesso restrito à equipe do site.</p>
+    @if (expired) {
+      <p class="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900" role="status">
+        Sua sessão expirou. Entre novamente.
+      </p>
+    }
+    <form class="mt-6 space-y-4" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div>
+        <label for="email" class="adm-label">E-mail</label>
+        <input
+          id="email"
+          type="email"
+          class="adm-input"
+          formControlName="email"
+          autocomplete="username"
+          required
+          [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+        />
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <p class="adm-error">Informe um e-mail válido.</p>
+        }
+      </div>
+      <div>
+        <label for="password" class="adm-label">Senha</label>
+        <input
+          id="password"
+          type="password"
+          class="adm-input"
+          formControlName="password"
+          autocomplete="current-password"
+          required
+          [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
+        />
+        @if (form.controls.password.invalid && form.controls.password.touched) {
+          <p class="adm-error">Informe a senha.</p>
+        }
+      </div>
+      @if (error()) {
+        <p class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+          {{ error() }}
+        </p>
+      }
+      <button type="submit" class="adm-btn-primary w-full" [disabled]="loading()">
+        {{ loading() ? 'Entrando…' : 'Entrar' }}
+      </button>
+    </form>
+  </div>
+  <p class="mt-4 text-center text-sm text-stone-600">
+    <a href="/" class="hover:underline">← Voltar ao site</a>
+  </p>
+</main>

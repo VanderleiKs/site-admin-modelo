@@ -1,0 +1,72 @@
+<div class="rounded-xl border border-dashed border-stone-300 bg-stone-50 p-3">
+  <div class="flex items-center gap-4">
+    <div
+      class="relative h-24 w-32 shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-stone-200"
+    >
+      @if (preview() ?? image()?.url; as src) {
+        <img
+          [src]="src"
+          [alt]="'Pré-visualização: ' + label()"
+          class="h-full w-full object-cover"
+        />
+      } @else {
+        <span class="flex h-full items-center justify-center text-stone-400"
+          ><app-icon name="image" [size]="28"
+        /></span>
+      }
+      @if (uploading()) {
+        <div
+          class="absolute inset-0 flex items-center justify-center bg-white/70 text-xs font-semibold"
+        >
+          {{ progress() }}%
+        </div>
+      }
+    </div>
+    <div class="min-w-0 flex-1 space-y-2">
+      <div class="flex flex-wrap gap-2">
+        <label
+          class="adm-btn-secondary cursor-pointer"
+          [class.pointer-events-none]="uploading()"
+          [class.opacity-50]="uploading()"
+        >
+          <input
+            type="file"
+            class="sr-only"
+            [accept]="accept"
+            (change)="onFile($event)"
+            [disabled]="uploading()"
+            [attr.aria-label]="label()"
+          />
+          <app-icon name="image" [size]="16" /> {{ image() ? 'Substituir' : buttonLabel() }}
+        </label>
+        @if (image() && removable() && !uploading()) {
+          <button type="button" class="adm-btn-secondary text-red-700" (click)="remove()">
+            Remover
+          </button>
+        }
+        @if (uploading()) {
+          <button type="button" class="adm-btn-secondary" (click)="cancel()">Cancelar</button>
+        }
+      </div>
+      @if (uploading()) {
+        <div
+          class="h-1.5 w-full overflow-hidden rounded-full bg-stone-200"
+          role="progressbar"
+          [attr.aria-valuenow]="progress()"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-label]="'Enviando ' + label()"
+        >
+          <div class="h-full bg-emerald-700 transition-all" [style.width.%]="progress()"></div>
+        </div>
+      }
+      @if (error()) {
+        <p class="adm-error" role="alert">{{ error() }}</p>
+      } @else {
+        <p class="adm-help">
+          JPEG, PNG ou WebP, até 5 MB. Prefira imagens com até 2000 px de largura.
+        </p>
+      }
+    </div>
+  </div>
+</div>

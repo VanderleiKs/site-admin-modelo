@@ -1,0 +1,55 @@
+{
+  "name": "site-institucional-ssr",
+  "version": "1.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "serve": "node dist/site-ssr/server/server.mjs",
+    "test": "npm run test:server && npm run test:app",
+    "test:app": "ng test --watch=false",
+    "test:server": "vitest run --config vitest.server.config.mts",
+    "test:ssr": "node --test e2e/ssr.smoke.mjs",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "lint": "npm run typecheck && prettier --check \"src/**/*.{ts,html,css}\"",
+    "format": "prettier --write \"src/**/*.{ts,html,css}\"",
+    "backup": "node scripts/backup.mjs"
+  },
+  "private": true,
+  "packageManager": "npm@10.9.4",
+  "dependencies": {
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/forms": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@angular/platform-server": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "@angular/ssr": "^22.2.2",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "express": "^5.1.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.2",
+    "@angular/cli": "^22.2.2",
+    "@angular/compiler-cli": "^22.2.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/express": "^5.0.1",
+    "@types/node": "^24.19.1",
+    "jsdom": "^30.0.0",
+    "postcss": "^8.5.29",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "typescript7": "npm:typescript@^7.0.2",
+    "vitest": "^5.0.0"
+  },
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
+  },
+  "description": "Site institucional + painel administrativo em uma \u00fanica aplica\u00e7\u00e3o Angular SSR (Express + SQLite)."
+}

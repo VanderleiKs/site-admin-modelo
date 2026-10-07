@@ -1,0 +1,76 @@
+@let s = store.settings()!;
+<section class="paper-texture border-b border-line bg-cream">
+  <div class="container-site py-14 md:py-20">
+    <nav aria-label="Trilha de navegação" class="text-sm text-ink-soft">
+      <a routerLink="/" class="hover:text-brand">Início</a>
+      <span aria-hidden="true" class="mx-1.5 text-ink-soft/50">/</span>
+      <span aria-current="page">Contato</span>
+    </nav>
+    <h1 class="mt-4 text-4xl font-semibold text-brand sm:text-5xl">Fale com a gente</h1>
+    <p class="mt-4 max-w-2xl text-lg text-ink-soft">
+      Pedidos, encomendas, dúvidas ou visitas: escolha o canal mais prático para você.
+    </p>
+  </div>
+</section>
+
+<section class="container-site grid gap-6 py-16 md:grid-cols-2 lg:grid-cols-3">
+  @if (store.whatsappUrl(); as wa) {
+    <a
+      [href]="wa"
+      target="_blank"
+      rel="noopener"
+      class="group flex flex-col rounded-3xl bg-brand p-8 text-white transition hover:bg-brand-deep md:col-span-2 lg:col-span-1 lg:row-span-2"
+    >
+      <app-icon name="whatsapp" [size]="40" class="text-accent" />
+      <h2 class="mt-6 text-2xl font-semibold">WhatsApp</h2>
+      <p class="mt-2 text-white/75">O jeito mais rápido de fazer pedidos e tirar dúvidas.</p>
+      <span
+        class="mt-auto inline-flex items-center gap-2 pt-8 font-semibold text-white underline decoration-accent decoration-2 underline-offset-4"
+        >Iniciar conversa
+        <app-icon name="arrowRight" [size]="18" class="transition group-hover:translate-x-1"
+      /></span>
+    </a>
+  }
+  @if (s.phone) {
+    <div class="rounded-3xl border border-line bg-white p-8">
+      <app-icon name="phone" [size]="28" class="text-accent-deep" />
+      <h2 class="mt-4 text-xl font-semibold">Telefone</h2>
+      <a [href]="'tel:' + phoneDigits()" class="mt-2 block text-lg text-brand hover:underline">{{
+        s.phone
+      }}</a>
+    </div>
+  }
+  @if (s.email) {
+    <div class="rounded-3xl border border-line bg-white p-8">
+      <app-icon name="mail" [size]="28" class="text-accent-deep" />
+      <h2 class="mt-4 text-xl font-semibold">E-mail</h2>
+      <a
+        [href]="'mailto:' + s.email"
+        class="mt-2 block break-all text-lg text-brand hover:underline"
+        >{{ s.email }}</a
+      >
+    </div>
+  }
+  @if (s.address) {
+    <div class="rounded-3xl border border-line bg-white p-8">
+      <app-icon name="pin" [size]="28" class="text-accent-deep" />
+      <h2 class="mt-4 text-xl font-semibold">Endereço</h2>
+      <address class="mt-2 text-ink-soft not-italic">{{ s.address }}</address>
+      <a
+        [href]="mapsUrl()"
+        target="_blank"
+        rel="noopener"
+        class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline"
+      >
+        Abrir no mapa <app-icon name="external" [size]="14" />
+      </a>
+    </div>
+  }
+  @if (s.openingHours) {
+    <div class="rounded-3xl border border-line bg-white p-8">
+      <app-icon name="clock" [size]="28" class="text-accent-deep" />
+      <h2 class="mt-4 text-xl font-semibold">Horário de atendimento</h2>
+      <p class="mt-2 text-ink-soft">{{ s.openingHours }}</p>
+    </div>
+  }
+</section>

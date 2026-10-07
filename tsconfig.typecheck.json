@@ -1,0 +1,13 @@
+/*
+ * Verificação de tipos de todo o projeto (site, painel, servidor e testes) com o
+ * TypeScript 7 (compilador nativo). O build do Angular usa internamente o TypeScript 6.0,
+ * versão exigida pelo compilador do Angular 22 — ver README, seção "TypeScript".
+ */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "vitest.server.config.mts"]
+}

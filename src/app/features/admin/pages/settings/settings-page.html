@@ -1,0 +1,312 @@
+<header class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 class="font-sans text-2xl font-semibold">Configurações do site</h1>
+    <p class="mt-1 text-sm text-stone-600">
+      Identidade, textos, contatos e SEO. As alterações aparecem no site imediatamente após salvar.
+    </p>
+  </div>
+  <a href="/" target="_blank" rel="noopener" class="adm-btn-secondary"
+    ><app-icon name="external" [size]="16" /> Ver site</a
+  >
+</header>
+
+@if (loadError()) {
+  <div class="adm-card mt-6 p-6 text-sm text-red-700" role="alert">{{ loadError() }}</div>
+} @else if (!loaded()) {
+  <p class="mt-6 text-sm text-stone-600" role="status">Carregando…</p>
+} @else {
+  <form class="mt-6 space-y-6" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <!-- Identidade -->
+    <section class="adm-card grid gap-5 p-5 sm:p-6 lg:grid-cols-2" aria-labelledby="s-id">
+      <h2 id="s-id" class="font-sans text-base font-semibold lg:col-span-2">Identidade</h2>
+      <div>
+        <label class="adm-label" for="companyName">Nome da empresa *</label>
+        <input id="companyName" class="adm-input" formControlName="companyName" maxlength="80" />
+        @if (err('companyName')) {
+          <p class="adm-error">{{ err('companyName') }}</p>
+        }
+      </div>
+      <div>
+        <label class="adm-label" for="tagline">Frase curta (abaixo do nome)</label>
+        <input id="tagline" class="adm-input" formControlName="tagline" maxlength="120" />
+      </div>
+      <div class="lg:col-span-2">
+        <p class="adm-label">Logotipo</p>
+        <app-image-uploader
+          label="Logotipo"
+          [image]="logo()"
+          (uploaded)="logo.set($event)"
+          (removed)="logo.set(null)"
+          (busy)="busy.set($event)"
+        />
+        <p class="adm-help">
+          Sem logotipo, o site exibe o nome da empresa com um ícone nas cores da marca.
+        </p>
+      </div>
+      <div class="grid grid-cols-3 gap-4 lg:col-span-2">
+        @for (c of colorFields; track c.key) {
+          <div>
+            <label class="adm-label" [for]="c.key">{{ c.label }}</label>
+            <div class="flex items-center gap-2">
+              <input
+                type="color"
+                class="h-10 w-12 cursor-pointer rounded border border-stone-300"
+                [formControlName]="c.key"
+                [attr.aria-label]="c.label + ' (seletor)'"
+              />
+              <input
+                [id]="c.key"
+                class="adm-input font-mono"
+                [formControlName]="c.key"
+                maxlength="7"
+              />
+            </div>
+            @if (err(c.key)) {
+              <p class="adm-error">{{ err(c.key) }}</p>
+            }
+          </div>
+        }
+        <p class="adm-help col-span-3">
+          Use uma cor principal escura o suficiente para texto branco legível (botões e rodapé).
+        </p>
+      </div>
+    </section>
+
+    <!-- Página inicial -->
+    <section class="adm-card grid gap-5 p-5 sm:p-6 lg:grid-cols-2" aria-labelledby="s-home">
+      <h2 id="s-home" class="font-sans text-base font-semibold lg:col-span-2">Página inicial</h2>
+      <div class="lg:col-span-2">
+        <p class="adm-label">Imagem principal</p>
+        <app-image-uploader
+          label="Imagem principal da página inicial"
+          [image]="heroImage()"
+          (uploaded)="heroImage.set($event)"
+          (removed)="heroImage.set(null)"
+          (busy)="busy.set($event)"
+        />
+      </div>
+      <div class="lg:col-span-2">
+        <label class="adm-label" for="heroTitle">Título principal *</label>
+        <input id="heroTitle" class="adm-input" formControlName="heroTitle" maxlength="120" />
+        @if (err('heroTitle')) {
+          <p class="adm-error">{{ err('heroTitle') }}</p>
+        }
+      </div>
+      <div class="lg:col-span-2">
+        <label class="adm-label" for="heroSubtitle">Texto de apoio *</label>
+        <textarea
+          id="heroSubtitle"
+          rows="3"
+          class="adm-input"
+          formControlName="heroSubtitle"
+          maxlength="400"
+        ></textarea>
+        @if (err('heroSubtitle')) {
+          <p class="adm-error">{{ err('heroSubtitle') }}</p>
+        }
+      </div>
+    </section>
+
+    <!-- Sobre -->
+    <section class="adm-card grid gap-5 p-5 sm:p-6" aria-labelledby="s-about">
+      <h2 id="s-about" class="font-sans text-base font-semibold">Apresentação da empresa</h2>
+      <div>
+        <label class="adm-label" for="aboutTitle">Título *</label>
+        <input id="aboutTitle" class="adm-input" formControlName="aboutTitle" maxlength="120" />
+      </div>
+      <div>
+        <label class="adm-label" for="aboutText">Texto de apresentação *</label>
+        <textarea
+          id="aboutText"
+          rows="8"
+          class="adm-input"
+          formControlName="aboutText"
+          maxlength="6000"
+        ></textarea>
+        <p class="adm-help">
+          Deixe uma linha em branco entre parágrafos. Os dois primeiros aparecem na página inicial.
+        </p>
+        @if (err('aboutText')) {
+          <p class="adm-error">{{ err('aboutText') }}</p>
+        }
+      </div>
+      <div>
+        <p class="adm-label">Imagem da apresentação</p>
+        <app-image-uploader
+          label="Imagem da apresentação"
+          [image]="aboutImage()"
+          (uploaded)="aboutImage.set($event)"
+          (removed)="aboutImage.set(null)"
+          (busy)="busy.set($event)"
+        />
+      </div>
+    </section>
+
+    <!-- Diferenciais e processo -->
+    @for (list of lists; track list.key) {
+      <section class="adm-card p-5 sm:p-6" [attr.aria-labelledby]="'s-' + list.key">
+        <div class="flex items-center justify-between">
+          <h2 [id]="'s-' + list.key" class="font-sans text-base font-semibold">{{ list.label }}</h2>
+          <button
+            type="button"
+            class="adm-btn-secondary"
+            (click)="addItem(list.key)"
+            [disabled]="arr(list.key).length >= maxItems"
+          >
+            <app-icon name="plus" [size]="16" /> Adicionar
+          </button>
+        </div>
+        <ol class="mt-4 space-y-3" [formArrayName]="list.key">
+          @for (item of arr(list.key).controls; track item; let i = $index) {
+            <li
+              class="grid gap-3 rounded-lg border border-stone-200 p-3 sm:grid-cols-[1fr_2fr_auto]"
+              [formGroupName]="i"
+            >
+              <div>
+                <label class="adm-label" [for]="list.key + i + 't'">Título</label>
+                <input
+                  [id]="list.key + i + 't'"
+                  class="adm-input"
+                  formControlName="title"
+                  maxlength="80"
+                />
+              </div>
+              <div>
+                <label class="adm-label" [for]="list.key + i + 'd'">Descrição</label>
+                <input
+                  [id]="list.key + i + 'd'"
+                  class="adm-input"
+                  formControlName="description"
+                  maxlength="400"
+                />
+              </div>
+              <button
+                type="button"
+                class="self-end rounded-lg p-2 text-red-600 hover:bg-red-50"
+                (click)="removeItem(list.key, i)"
+              >
+                <span class="sr-only">Remover item {{ i + 1 }}</span
+                ><app-icon name="trash" [size]="18" />
+              </button>
+            </li>
+          }
+        </ol>
+        @if (!arr(list.key).length) {
+          <p class="mt-3 text-sm text-stone-600">Nenhum item: a seção não aparece no site.</p>
+        }
+      </section>
+    }
+
+    <!-- Contato -->
+    <section class="adm-card grid gap-5 p-5 sm:p-6 lg:grid-cols-2" aria-labelledby="s-contact">
+      <h2 id="s-contact" class="font-sans text-base font-semibold lg:col-span-2">Contato</h2>
+      <div>
+        <label class="adm-label" for="whatsapp">WhatsApp (com DDI e DDD)</label>
+        <input
+          id="whatsapp"
+          class="adm-input"
+          formControlName="whatsapp"
+          inputmode="tel"
+          placeholder="55 54 99999-0000"
+        />
+        @if (err('whatsapp')) {
+          <p class="adm-error">{{ err('whatsapp') }}</p>
+        } @else {
+          <p class="adm-help">Usado nos botões "Pedir pelo WhatsApp".</p>
+        }
+      </div>
+      <div>
+        <label class="adm-label" for="phone">Telefone</label>
+        <input id="phone" class="adm-input" formControlName="phone" maxlength="30" />
+      </div>
+      <div class="lg:col-span-2">
+        <label class="adm-label" for="whatsappMessage">Mensagem inicial do WhatsApp</label>
+        <input
+          id="whatsappMessage"
+          class="adm-input"
+          formControlName="whatsappMessage"
+          maxlength="300"
+        />
+      </div>
+      <div>
+        <label class="adm-label" for="email">E-mail</label>
+        <input id="email" type="email" class="adm-input" formControlName="email" maxlength="254" />
+        @if (err('email')) {
+          <p class="adm-error">{{ err('email') }}</p>
+        }
+      </div>
+      <div>
+        <label class="adm-label" for="openingHours">Horário de atendimento</label>
+        <input id="openingHours" class="adm-input" formControlName="openingHours" maxlength="300" />
+      </div>
+      <div class="lg:col-span-2">
+        <label class="adm-label" for="address">Endereço</label>
+        <input id="address" class="adm-input" formControlName="address" maxlength="300" />
+      </div>
+    </section>
+
+    <!-- Redes sociais -->
+    <section class="adm-card grid gap-5 p-5 sm:p-6 lg:grid-cols-2" aria-labelledby="s-social">
+      <h2 id="s-social" class="font-sans text-base font-semibold lg:col-span-2">Redes sociais</h2>
+      @for (s of socialFields; track s.key) {
+        <div>
+          <label class="adm-label" [for]="s.key">{{ s.label }}</label>
+          <input
+            [id]="s.key"
+            type="url"
+            class="adm-input"
+            [formControlName]="s.key"
+            placeholder="https://"
+            maxlength="300"
+          />
+          @if (err(s.key)) {
+            <p class="adm-error">{{ err(s.key) }}</p>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- SEO -->
+    <section class="adm-card grid gap-5 p-5 sm:p-6" aria-labelledby="s-seo">
+      <h2 id="s-seo" class="font-sans text-base font-semibold">SEO (mecanismos de busca)</h2>
+      <div>
+        <label class="adm-label" for="seoTitle">Título da página inicial *</label>
+        <input id="seoTitle" class="adm-input" formControlName="seoTitle" maxlength="70" />
+        <p class="adm-help">
+          {{ form.controls.seoTitle.value.length }}/70 — aparece na aba do navegador e no Google.
+        </p>
+        @if (err('seoTitle')) {
+          <p class="adm-error">{{ err('seoTitle') }}</p>
+        }
+      </div>
+      <div>
+        <label class="adm-label" for="seoDescription">Descrição *</label>
+        <textarea
+          id="seoDescription"
+          rows="3"
+          class="adm-input"
+          formControlName="seoDescription"
+          maxlength="170"
+        ></textarea>
+        <p class="adm-help">
+          {{ form.controls.seoDescription.value.length }}/170 — resumo exibido nos resultados de
+          busca.
+        </p>
+        @if (err('seoDescription')) {
+          <p class="adm-error">{{ err('seoDescription') }}</p>
+        }
+      </div>
+    </section>
+
+    <div
+      class="sticky bottom-0 -mx-4 flex items-center justify-end gap-3 border-t border-stone-200 bg-stone-100/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10"
+    >
+      @if (formError()) {
+        <p class="mr-auto text-sm text-red-700" role="alert">{{ formError() }}</p>
+      }
+      <button type="submit" class="adm-btn-primary" [disabled]="saving() || busy()">
+        {{ saving() ? 'Salvando…' : 'Salvar configurações' }}
+      </button>
+    </div>
+  </form>
+}

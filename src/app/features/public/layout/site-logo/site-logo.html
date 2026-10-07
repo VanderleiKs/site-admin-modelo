@@ -1,0 +1,45 @@
+@let s = store.settings();
+@if (s?.logo; as logo) {
+  <span class="relative block h-11 w-44">
+    <img
+      [ngSrc]="logo.url"
+      fill
+      priority
+      [alt]="s?.companyName ?? ''"
+      class="object-contain object-left"
+    />
+  </span>
+} @else {
+  <span class="flex items-center gap-3">
+    <svg viewBox="0 0 64 64" class="h-10 w-10" aria-hidden="true">
+      <rect
+        width="64"
+        height="64"
+        rx="16"
+        [attr.fill]="light() ? 'rgba(255,255,255,0.12)' : 'var(--brand-primary)'"
+      />
+      <path d="M14 27 L14 42 A18 5 0 0 0 50 42 L50 27 Z" fill="var(--brand-accent)" />
+      <ellipse cx="32" cy="27" rx="18" ry="5" fill="#f3d27a" />
+      <path d="M34 28 L50 26 L50 40 L34 44 Z" fill="#f8e6ad" />
+      <circle cx="42" cy="35" r="2" fill="var(--brand-accent)" />
+    </svg>
+    <span class="flex flex-col leading-none">
+      <span
+        class="font-display text-xl font-semibold tracking-tight"
+        [class.text-white]="light()"
+        [class.text-brand]="!light()"
+      >
+        {{ s?.companyName }}
+      </span>
+      @if (s?.tagline) {
+        <span
+          class="mt-1 text-[0.65rem] font-semibold tracking-[0.22em] uppercase"
+          [class.text-white/70]="light()"
+          [class.text-accent-deep]="!light()"
+        >
+          {{ s?.tagline }}
+        </span>
+      }
+    </span>
+  </span>
+}

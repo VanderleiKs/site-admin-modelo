@@ -1,0 +1,41 @@
+<section class="container-site py-20" aria-labelledby="cta-title">
+  <div
+    class="relative overflow-hidden rounded-[2.5rem] bg-accent px-8 py-14 text-ink sm:px-14 md:py-16"
+  >
+    <svg
+      class="pointer-events-none absolute -right-16 -bottom-24 h-80 w-80 text-white/20"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        fill="currentColor"
+        d="M12 4c5 0 9 1.8 9 4v8c0 2.2-4 4-9 4s-9-1.8-9-4V8c0-2.2 4-4 9-4Z"
+      />
+    </svg>
+    <div class="relative max-w-2xl">
+      <p class="text-xs font-semibold tracking-[0.2em] uppercase">Pedidos e encomendas</p>
+      <h2 id="cta-title" class="mt-3 text-3xl font-semibold sm:text-4xl">
+        Gostou de algum produto? Fale com a gente.
+      </h2>
+      <p class="mt-4 text-base leading-relaxed text-ink">
+        Fale direto com a {{ store.companyName() }}: tire dúvidas, consulte disponibilidade e
+        combine retirada ou entrega.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        @if (store.whatsappUrl(); as wa) {
+          <a
+            [href]="wa"
+            target="_blank"
+            rel="noopener"
+            class="btn bg-brand text-white hover:bg-brand-deep"
+          >
+            <app-icon name="whatsapp" [size]="18" /> Pedir pelo WhatsApp
+          </a>
+        }
+        <a routerLink="/contato" class="btn border border-ink/20 hover:bg-white/30"
+          >Outros contatos</a
+        >
+      </div>
+    </div>
+  </div>
+</section>

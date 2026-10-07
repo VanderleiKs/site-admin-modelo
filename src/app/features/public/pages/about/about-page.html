@@ -1,0 +1,76 @@
+@let s = store.settings()!;
+<section class="paper-texture border-b border-line bg-cream">
+  <div class="container-site py-14 md:py-20">
+    <nav aria-label="Trilha de navegação" class="text-sm text-ink-soft">
+      <a routerLink="/" class="hover:text-brand">Início</a>
+      <span aria-hidden="true" class="mx-1.5 text-ink-soft/50">/</span>
+      <span aria-current="page">Sobre</span>
+    </nav>
+    <h1 class="mt-4 max-w-3xl text-4xl font-semibold text-brand sm:text-5xl">{{ s.aboutTitle }}</h1>
+  </div>
+</section>
+
+<section class="container-site grid gap-12 py-16 md:py-24 lg:grid-cols-12">
+  <div class="lg:col-span-7">
+    @for (p of text(); track $index; let first = $first) {
+      <p
+        class="leading-relaxed text-ink-soft"
+        [class]="
+          first
+            ? 'text-xl text-ink first-letter:float-left first-letter:mr-3 first-letter:font-display first-letter:text-6xl first-letter:leading-none first-letter:text-accent-deep'
+            : 'mt-6 text-lg'
+        "
+      >
+        {{ p }}
+      </p>
+    }
+  </div>
+  <aside class="lg:col-span-5">
+    <div
+      class="relative aspect-[4/5] overflow-hidden rounded-t-[10rem] rounded-b-[2rem] bg-cream lg:sticky lg:top-28"
+    >
+      @if (s.aboutImage; as img) {
+        <img [ngSrc]="img.url" fill priority [alt]="img.alt || ''" class="object-cover" />
+      } @else if (s.heroImage; as img) {
+        <img [ngSrc]="img.url" fill priority [alt]="img.alt || ''" class="object-cover" />
+      }
+    </div>
+  </aside>
+</section>
+
+@if (s.features.length) {
+  <section class="bg-cream/60 py-16 md:py-24" aria-labelledby="valores-titulo">
+    <div class="container-site">
+      <h2 id="valores-titulo" class="text-3xl font-semibold text-brand">No que acreditamos</h2>
+      <ul class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        @for (f of s.features; track $index) {
+          <li class="rounded-3xl bg-white p-7">
+            <app-icon name="check" [size]="22" class="text-accent-deep" />
+            <h3 class="mt-4 text-lg font-semibold">{{ f.title }}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-ink-soft">{{ f.description }}</p>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+}
+
+@if (s.processSteps.length) {
+  <section class="container-site py-16 md:py-24" aria-labelledby="processo-titulo">
+    <h2 id="processo-titulo" class="text-3xl font-semibold text-brand">Como trabalhamos</h2>
+    <ol class="mt-10 space-y-6 border-l-2 border-accent/40 pl-8">
+      @for (step of s.processSteps; track $index) {
+        <li class="relative">
+          <span
+            class="absolute top-1 -left-[2.6rem] flex h-6 w-6 items-center justify-center rounded-full bg-accent text-xs font-bold text-ink"
+            >{{ $index + 1 }}</span
+          >
+          <h3 class="text-xl font-semibold">{{ step.title }}</h3>
+          <p class="mt-1 text-ink-soft">{{ step.description }}</p>
+        </li>
+      }
+    </ol>
+  </section>
+}
+
+<app-whatsapp-cta />

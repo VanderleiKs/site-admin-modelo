@@ -1,0 +1,70 @@
+<header class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 class="font-sans text-2xl font-semibold">Olá, {{ auth.user()?.name }}</h1>
+    <p class="mt-1 text-sm text-stone-600">Resumo do conteúdo publicado no site.</p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <a routerLink="/admin/produtos/novo" class="adm-btn-primary"
+      ><app-icon name="plus" [size]="16" /> Novo produto</a
+    >
+    <a routerLink="/admin/produtos" class="adm-btn-secondary">Editar produtos</a>
+  </div>
+</header>
+
+@if (error()) {
+  <div class="adm-card mt-6 p-6 text-sm text-red-700" role="alert">
+    {{ error() }}
+    <button type="button" class="ml-2 underline" (click)="load()">Tentar novamente</button>
+  </div>
+} @else if (summary(); as data) {
+  <section class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores">
+    @for (card of cards(); track card.label) {
+      <div class="adm-card p-5">
+        <p class="text-sm text-stone-600">{{ card.label }}</p>
+        <p class="mt-2 text-3xl font-semibold">{{ card.value }}</p>
+        <p class="mt-1 text-xs text-stone-600">{{ card.hint }}</p>
+      </div>
+    }
+  </section>
+
+  <section class="adm-card mt-8" aria-labelledby="recentes">
+    <h2 id="recentes" class="border-b border-stone-200 px-5 py-4 font-sans text-base font-semibold">
+      Atualizados recentemente
+    </h2>
+    @if (data.recentlyUpdated.length) {
+      <ul class="divide-y divide-stone-100">
+        @for (product of data.recentlyUpdated; track product.id) {
+          <li class="flex items-center justify-between gap-3 px-5 py-3 text-sm">
+            <span class="min-w-0">
+              <span class="block truncate">
+                {{ product.name }}
+                @if (!product.active) {
+                  <span class="ml-2 rounded bg-stone-100 px-1.5 py-0.5 text-xs text-stone-600"
+                    >inativo</span
+                  >
+                }
+              </span>
+              <span class="text-xs text-stone-600">{{
+                product.updatedAt | date: 'dd/MM/yyyy HH:mm'
+              }}</span>
+            </span>
+            <a
+              [routerLink]="['/admin/produtos', product.id]"
+              class="text-emerald-800 hover:underline"
+              >Editar</a
+            >
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="px-5 py-6 text-sm text-stone-600">
+        Nenhum produto cadastrado ainda.
+        <a routerLink="/admin/produtos/novo" class="text-emerald-800 underline"
+          >Cadastre o primeiro</a
+        >.
+      </p>
+    }
+  </section>
+} @else {
+  <p class="mt-8 text-sm text-stone-600" role="status">Carregando…</p>
+}

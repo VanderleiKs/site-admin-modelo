@@ -1,0 +1,193 @@
+@let s = store.settings()!;
+<!-- Seção principal -->
+<section class="paper-texture relative overflow-hidden bg-cream">
+  <div class="container-site grid items-center gap-12 py-16 md:py-24 lg:grid-cols-12">
+    <div class="animate-fade-up lg:col-span-6">
+      @if (s.tagline) {
+        <p class="eyebrow">{{ s.tagline }}</p>
+      }
+      <h1 class="mt-4 text-4xl leading-[1.05] font-semibold text-brand sm:text-5xl lg:text-6xl">
+        {{ s.heroTitle }}
+      </h1>
+      <p class="mt-6 max-w-xl text-lg leading-relaxed text-ink-soft">{{ s.heroSubtitle }}</p>
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a routerLink="/produtos" class="btn-primary"
+          >Ver produtos <app-icon name="arrowRight" [size]="18"
+        /></a>
+        @if (store.whatsappUrl(); as wa) {
+          <a [href]="wa" target="_blank" rel="noopener" class="btn-outline"
+            ><app-icon name="whatsapp" [size]="18" /> Pedir pelo WhatsApp</a
+          >
+        }
+      </div>
+    </div>
+    <div class="relative lg:col-span-6">
+      <div
+        class="absolute -top-6 -left-6 hidden h-32 w-32 rounded-full border-2 border-dashed border-accent/50 lg:block"
+        aria-hidden="true"
+      ></div>
+      <div
+        class="relative aspect-[4/3] overflow-hidden rounded-t-[12rem] rounded-b-[2rem] bg-cream-deep shadow-2xl shadow-brand/20 ring-8 ring-white/60"
+      >
+        @if (s.heroImage; as img) {
+          <img
+            [ngSrc]="img.url"
+            fill
+            priority
+            [alt]="img.alt || s.companyName"
+            class="object-cover"
+          />
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Apresentação -->
+@if (s.aboutText) {
+  <section
+    class="container-site grid items-center gap-12 py-20 md:py-28 lg:grid-cols-2"
+    aria-labelledby="sobre-titulo"
+  >
+    <div class="relative order-2 lg:order-1">
+      <div class="relative aspect-[4/3] overflow-hidden rounded-[2rem] bg-cream">
+        @if (s.aboutImage; as img) {
+          <img [ngSrc]="img.url" fill [alt]="img.alt || ''" class="object-cover" />
+        }
+      </div>
+      <div
+        class="absolute -right-4 -bottom-6 hidden rounded-2xl bg-brand px-6 py-5 text-white shadow-xl sm:block"
+      >
+        <p class="font-display text-3xl font-semibold">{{ store.categories().length }}</p>
+        <p class="text-xs tracking-wide text-white/75 uppercase">linhas de produtos</p>
+      </div>
+    </div>
+    <div class="order-1 lg:order-2">
+      <p class="eyebrow">Quem somos</p>
+      <h2 id="sobre-titulo" class="mt-3 text-3xl font-semibold text-brand sm:text-4xl">
+        {{ s.aboutTitle }}
+      </h2>
+      @for (p of aboutPreview(); track $index) {
+        <p class="mt-5 leading-relaxed text-ink-soft">{{ p }}</p>
+      }
+      <a
+        routerLink="/sobre"
+        class="mt-8 inline-flex items-center gap-2 font-semibold text-brand hover:text-accent-deep"
+      >
+        Conheça nossa história <app-icon name="arrowRight" [size]="18" />
+      </a>
+    </div>
+  </section>
+}
+
+<!-- Produtos em destaque -->
+@if (featuredState() !== 'ready' || featured().length) {
+  <section class="bg-cream/60 py-20 md:py-28" aria-labelledby="destaques-titulo">
+    <div class="container-site">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="eyebrow">Seleção da casa</p>
+          <h2 id="destaques-titulo" class="mt-3 text-3xl font-semibold text-brand sm:text-4xl">
+            Produtos em destaque
+          </h2>
+        </div>
+        <a routerLink="/produtos" class="btn-outline">Ver todos os produtos</a>
+      </div>
+      <div class="mt-12">
+        @switch (featuredState()) {
+          @case ('loading') {
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              @for (i of [1, 2, 3]; track i) {
+                <app-card-skeleton />
+              }
+            </div>
+          }
+          @case ('error') {
+            <app-state-message
+              kind="error"
+              title="Não foi possível carregar os destaques"
+              (retry)="loadFeatured()"
+            />
+          }
+          @default {
+            @if (featured().length) {
+              <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                @for (p of featured(); track p.id) {
+                  <li><app-product-card [product]="p" /></li>
+                }
+              </ul>
+            } @else {
+              <app-state-message
+                title="Em breve, novidades por aqui"
+                message="Confira o catálogo completo."
+              />
+            }
+          }
+        }
+      </div>
+    </div>
+  </section>
+}
+
+<!-- Diferenciais -->
+@if (s.features.length) {
+  <section class="container-site py-20 md:py-28" aria-labelledby="diferenciais-titulo">
+    <div class="max-w-2xl">
+      <p class="eyebrow">Por que escolher</p>
+      <h2 id="diferenciais-titulo" class="mt-3 text-3xl font-semibold text-brand sm:text-4xl">
+        O que faz a diferença
+      </h2>
+    </div>
+    <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      @for (f of s.features; track $index) {
+        <li class="rounded-3xl border border-line bg-white p-7 transition hover:border-accent/60">
+          <span
+            class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand"
+          >
+            <app-icon [name]="$index % 2 === 0 ? 'leaf' : 'wheel'" [size]="24" />
+          </span>
+          <h3 class="mt-5 text-lg font-semibold text-ink">{{ f.title }}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-ink-soft">{{ f.description }}</p>
+        </li>
+      }
+    </ul>
+  </section>
+}
+
+<!-- Processo artesanal -->
+@if (s.processSteps.length) {
+  <section
+    class="relative overflow-hidden bg-brand py-20 text-white md:py-28"
+    aria-labelledby="processo-titulo"
+  >
+    <div
+      class="pointer-events-none absolute inset-0 opacity-[0.07]"
+      aria-hidden="true"
+      style="
+        background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0);
+        background-size: 22px 22px;
+      "
+    ></div>
+    <div class="container-site relative">
+      <div class="max-w-2xl">
+        <p class="text-xs font-semibold tracking-[0.2em] text-accent uppercase">Do início ao fim</p>
+        <h2 id="processo-titulo" class="mt-3 text-3xl font-semibold sm:text-4xl">Nosso processo</h2>
+      </div>
+      <ol class="mt-14 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+        @for (step of s.processSteps; track $index) {
+          <li class="relative border-t border-white/20 pt-6">
+            <span class="font-display text-5xl font-semibold text-accent/90">{{
+              ($index + 1).toString().padStart(2, '0')
+            }}</span>
+            <h3 class="mt-4 text-xl font-semibold">{{ step.title }}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-white/75">{{ step.description }}</p>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+}
+
+@if (store.whatsappUrl()) {
+  <app-whatsapp-cta />
+}

@@ -1,0 +1,52 @@
+<header>
+  <h1 class="font-sans text-2xl font-semibold">Minha conta</h1>
+  <p class="mt-1 text-sm text-stone-600">{{ auth.user()?.name }} · {{ auth.user()?.email }}</p>
+</header>
+
+<section class="adm-card mt-6 max-w-lg p-5 sm:p-6" aria-labelledby="titulo-senha">
+  <h2 id="titulo-senha" class="font-sans text-base font-semibold">Alterar senha</h2>
+  <p class="adm-help">Depois da troca, você precisará entrar novamente.</p>
+
+  <form class="mt-4 space-y-4" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div>
+      <label class="adm-label" for="current">Senha atual</label>
+      <input
+        id="current"
+        type="password"
+        class="adm-input"
+        formControlName="currentPassword"
+        autocomplete="current-password"
+      />
+    </div>
+    <div>
+      <label class="adm-label" for="new">Nova senha</label>
+      <input
+        id="new"
+        type="password"
+        class="adm-input"
+        formControlName="newPassword"
+        autocomplete="new-password"
+        aria-describedby="new-help"
+      />
+      <p id="new-help" class="adm-help">
+        Mínimo de 10 caracteres, combinando 3 tipos: minúsculas, maiúsculas, números e símbolos.
+      </p>
+    </div>
+    <div>
+      <label class="adm-label" for="confirm">Confirme a nova senha</label>
+      <input
+        id="confirm"
+        type="password"
+        class="adm-input"
+        formControlName="confirmPassword"
+        autocomplete="new-password"
+      />
+    </div>
+    @if (error()) {
+      <p class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{{ error() }}</p>
+    }
+    <button type="submit" class="adm-btn-primary" [disabled]="saving()">
+      {{ saving() ? 'Salvando…' : 'Alterar senha' }}
+    </button>
+  </form>
+</section>

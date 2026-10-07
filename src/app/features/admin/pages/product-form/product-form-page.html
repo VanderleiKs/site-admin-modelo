@@ -1,0 +1,330 @@
+<header class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <a
+      routerLink="/admin/produtos"
+      class="inline-flex items-center gap-1 text-sm text-stone-600 hover:text-stone-900"
+      ><app-icon name="arrowLeft" [size]="16" /> Produtos</a
+    >
+    <h1 class="mt-2 font-sans text-2xl font-semibold">
+      {{ isEdit() ? 'Editar produto' : 'Novo produto' }}
+    </h1>
+  </div>
+  @if (saved(); as p) {
+    @if (p.active) {
+      <a [href]="'/produtos/' + p.slug" target="_blank" rel="noopener" class="adm-btn-secondary"
+        ><app-icon name="external" [size]="16" /> Ver no site</a
+      >
+    } @else {
+      <span class="text-sm text-stone-600">Produto inativo (não aparece no site)</span>
+    }
+  }
+</header>
+
+@if (loadError()) {
+  <div class="adm-card mt-6 p-6 text-sm text-red-700" role="alert">{{ loadError() }}</div>
+} @else if (loading()) {
+  <p class="mt-6 text-sm text-stone-600" role="status">Carregando…</p>
+} @else {
+  <form class="mt-6 grid gap-6 xl:grid-cols-3" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="space-y-6 xl:col-span-2">
+      <section class="adm-card space-y-5 p-5 sm:p-6" aria-labelledby="sec-info">
+        <h2 id="sec-info" class="font-sans text-base font-semibold">Informações</h2>
+        <div>
+          <label class="adm-label" for="name">Nome *</label>
+          <input
+            id="name"
+            class="adm-input"
+            formControlName="name"
+            maxlength="120"
+            (input)="onNameInput()"
+            [attr.aria-invalid]="invalid('name')"
+            aria-describedby="name-err"
+          />
+          @if (invalid('name')) {
+            <p id="name-err" class="adm-error">
+              {{ errorFor('name', 'Informe um nome com 2 a 120 caracteres.') }}
+            </p>
+          }
+        </div>
+        <div>
+          <label class="adm-label" for="slug">Endereço (slug) *</label>
+          <div
+            class="flex items-center rounded-lg border border-stone-300 bg-stone-50 focus-within:border-emerald-700"
+          >
+            <span class="hidden pl-3 text-sm text-stone-600 sm:inline">/produtos/</span>
+            <input
+              id="slug"
+              class="adm-input !border-0 !shadow-none !ring-0"
+              formControlName="slug"
+              maxlength="140"
+              (input)="markSlugEdited()"
+              [attr.aria-invalid]="invalid('slug')"
+              aria-describedby="slug-help"
+            />
+          </div>
+          @if (invalid('slug')) {
+            <p class="adm-error">
+              {{
+                errorFor(
+                  'slug',
+                  'Use apenas letras minúsculas, números e hífens (ex.: queijo-colonial).'
+                )
+              }}
+            </p>
+          } @else {
+            <p id="slug-help" class="adm-help">
+              Gerado a partir do nome. Alterar o slug muda o endereço da página do produto.
+            </p>
+          }
+        </div>
+        <div>
+          <label class="adm-label" for="short">Descrição curta *</label>
+          <textarea
+            id="short"
+            rows="2"
+            class="adm-input"
+            formControlName="shortDescription"
+            maxlength="280"
+            [attr.aria-invalid]="invalid('shortDescription')"
+          ></textarea>
+          <div class="flex justify-between">
+            @if (invalid('shortDescription')) {
+              <p class="adm-error">
+                {{ errorFor('shortDescription', 'Entre 10 e 280 caracteres.') }}
+              </p>
+            } @else {
+              <p class="adm-help">Aparece nos cartões do catálogo e nos resultados de busca.</p>
+            }
+            <p class="adm-help">{{ form.controls.shortDescription.value.length }}/280</p>
+          </div>
+        </div>
+        <div>
+          <label class="adm-label" for="desc">Descrição completa *</label>
+          <textarea
+            id="desc"
+            rows="8"
+            class="adm-input"
+            formControlName="description"
+            maxlength="5000"
+            [attr.aria-invalid]="invalid('description')"
+          ></textarea>
+          <div class="flex justify-between">
+            @if (invalid('description')) {
+              <p class="adm-error">{{ errorFor('description', 'Entre 10 e 5000 caracteres.') }}</p>
+            } @else {
+              <p class="adm-help">Deixe uma linha em branco para separar parágrafos.</p>
+            }
+            <p class="adm-help">{{ form.controls.description.value.length }}/5000</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="adm-card space-y-5 p-5 sm:p-6" aria-labelledby="sec-img">
+        <h2 id="sec-img" class="font-sans text-base font-semibold">Imagens</h2>
+        <div>
+          <p class="adm-label">Imagem principal</p>
+          <app-image-uploader
+            label="Imagem principal"
+            [image]="mainImage()"
+            [alt]="form.controls.name.value"
+            (uploaded)="mainImage.set($event)"
+            (removed)="mainImage.set(null)"
+            (busy)="setUploading('main', $event)"
+          />
+        </div>
+        <div>
+          <p class="adm-label">Galeria ({{ gallery().length }}/{{ maxGallery }})</p>
+          @if (gallery().length) {
+            <ul class="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              @for (
+                img of gallery();
+                track img.id;
+                let i = $index;
+                let first = $first;
+                let last = $last
+              ) {
+                <li class="overflow-hidden rounded-lg border border-stone-200 bg-white">
+                  <img
+                    [src]="img.url"
+                    [alt]="'Imagem ' + (i + 1) + ' da galeria'"
+                    class="aspect-[4/3] w-full object-cover"
+                  />
+                  <div class="flex justify-between p-1">
+                    <div class="flex">
+                      <button
+                        type="button"
+                        class="rounded p-1 text-stone-600 hover:bg-stone-100 disabled:opacity-30"
+                        [disabled]="first"
+                        (click)="moveGallery(i, -1)"
+                      >
+                        <span class="sr-only">Mover para a esquerda</span
+                        ><app-icon name="arrowLeft" [size]="16" />
+                      </button>
+                      <button
+                        type="button"
+                        class="rounded p-1 text-stone-600 hover:bg-stone-100 disabled:opacity-30"
+                        [disabled]="last"
+                        (click)="moveGallery(i, 1)"
+                      >
+                        <span class="sr-only">Mover para a direita</span
+                        ><app-icon name="arrowRight" [size]="16" />
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      class="rounded p-1 text-red-600 hover:bg-red-50"
+                      (click)="removeGallery(i)"
+                    >
+                      <span class="sr-only">Remover imagem {{ i + 1 }}</span
+                      ><app-icon name="trash" [size]="16" />
+                    </button>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+          @if (gallery().length < maxGallery) {
+            <app-image-uploader
+              label="Adicionar imagem à galeria"
+              buttonLabel="Adicionar à galeria"
+              [removable]="false"
+              [alt]="form.controls.name.value"
+              (uploaded)="addGallery($event)"
+              (busy)="setUploading('gallery', $event)"
+            />
+          }
+          <p class="adm-help">
+            Imagens removidas são apagadas do armazenamento ao salvar, se não forem usadas em outro
+            lugar.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <div class="space-y-6">
+      <section class="adm-card space-y-5 p-5 sm:p-6" aria-labelledby="sec-pub">
+        <h2 id="sec-pub" class="font-sans text-base font-semibold">Publicação</h2>
+        <label class="flex items-start gap-3">
+          <input type="checkbox" class="mt-1 h-4 w-4 accent-emerald-700" formControlName="active" />
+          <span
+            ><span class="block text-sm font-medium">Ativo</span
+            ><span class="adm-help block">Produtos inativos não aparecem no site.</span></span
+          >
+        </label>
+        <label class="flex items-start gap-3">
+          <input
+            type="checkbox"
+            class="mt-1 h-4 w-4 accent-emerald-700"
+            formControlName="featured"
+          />
+          <span
+            ><span class="block text-sm font-medium">Destaque</span
+            ><span class="adm-help block">Exibido na página inicial.</span></span
+          >
+        </label>
+      </section>
+
+      <section class="adm-card space-y-5 p-5 sm:p-6" aria-labelledby="sec-cat">
+        <h2 id="sec-cat" class="font-sans text-base font-semibold">Catálogo</h2>
+        <div>
+          <label class="adm-label" for="cat">Categoria *</label>
+          <select
+            id="cat"
+            class="adm-input"
+            formControlName="categoryId"
+            [attr.aria-invalid]="invalid('categoryId')"
+          >
+            <option value="" disabled>Selecione…</option>
+            @for (c of categories(); track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+          @if (invalid('categoryId')) {
+            <p class="adm-error">{{ errorFor('categoryId', 'Selecione uma categoria.') }}</p>
+          }
+          @if (!categories().length) {
+            <p class="adm-help">
+              Nenhuma categoria.
+              <a routerLink="/admin/categorias" class="underline">Crie uma categoria</a> primeiro.
+            </p>
+          }
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="adm-label" for="price">Preço (R$)</label>
+            <input
+              id="price"
+              class="adm-input"
+              formControlName="price"
+              inputmode="decimal"
+              placeholder="Sob consulta"
+              [attr.aria-invalid]="invalid('price')"
+            />
+          </div>
+          <div>
+            <label class="adm-label" for="unit">Unidade</label>
+            <input
+              id="unit"
+              class="adm-input"
+              formControlName="priceUnit"
+              maxlength="30"
+              placeholder="kg, unidade…"
+            />
+          </div>
+        </div>
+        @if (invalid('price')) {
+          <p class="adm-error">{{ errorFor('price', 'Preço inválido.') }}</p>
+        } @else {
+          <p class="adm-help -mt-3">Deixe em branco para exibir "Sob consulta".</p>
+        }
+        <div>
+          <label class="adm-label" for="avail">Disponibilidade</label>
+          <select id="avail" class="adm-input" formControlName="availability">
+            @for (a of availabilityOptions; track a.value) {
+              <option [value]="a.value">{{ a.label }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="adm-label" for="order">Ordem de exibição</label>
+          <input id="order" type="number" min="0" class="adm-input" formControlName="sortOrder" />
+          <p class="adm-help">Menor número aparece primeiro no site.</p>
+        </div>
+      </section>
+
+      @if (formError()) {
+        <p class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+          {{ formError() }}
+        </p>
+      }
+
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="submit"
+          class="adm-btn-primary flex-1"
+          [disabled]="saving() || uploadingCount() > 0"
+        >
+          {{
+            saving()
+              ? 'Salvando…'
+              : uploadingCount() > 0
+                ? 'Aguardando envio…'
+                : isEdit()
+                  ? 'Salvar alterações'
+                  : 'Cadastrar produto'
+          }}
+        </button>
+        @if (isEdit()) {
+          <button
+            type="button"
+            class="adm-btn-secondary text-red-700"
+            (click)="remove()"
+            [disabled]="saving()"
+          >
+            Excluir
+          </button>
+        }
+      </div>
+    </div>
+  </form>
+}

@@ -1,0 +1,104 @@
+<section class="paper-texture border-b border-line bg-cream">
+  <div class="container-site py-14 md:py-20">
+    <nav aria-label="Trilha de navegação" class="text-sm text-ink-soft">
+      <a routerLink="/" class="hover:text-brand">Início</a>
+      <span aria-hidden="true" class="mx-1.5 text-ink-soft/50">/</span>
+      <span aria-current="page">Produtos</span>
+    </nav>
+    <h1 class="mt-4 text-4xl font-semibold text-brand sm:text-5xl">
+      {{ category()?.name ?? 'Nossos produtos' }}
+    </h1>
+    <p class="mt-4 max-w-2xl text-lg text-ink-soft">
+      {{
+        category()?.description ??
+          'Conheça tudo o que produzimos. Clique em um produto para ver detalhes e fazer seu pedido.'
+      }}
+    </p>
+  </div>
+</section>
+
+<section class="container-site py-12" aria-label="Catálogo">
+  <nav aria-label="Filtrar por categoria" class="-mx-5 overflow-x-auto px-5 pb-2">
+    <ul class="flex min-w-max gap-2">
+      <li>
+        <a
+          routerLink="/produtos"
+          [attr.aria-current]="!selected() ? 'page' : null"
+          class="inline-flex rounded-full border px-4 py-2 text-sm font-medium transition"
+          [class]="
+            !selected()
+              ? 'border-brand bg-brand text-white'
+              : 'border-line bg-white text-ink-soft hover:border-brand hover:text-brand'
+          "
+        >
+          Todos
+        </a>
+      </li>
+      @for (c of store.categories(); track c.id) {
+        @if (c.productCount > 0) {
+          <li>
+            <a
+              routerLink="/produtos"
+              [queryParams]="{ categoria: c.slug }"
+              [attr.aria-current]="selected() === c.slug ? 'page' : null"
+              class="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition"
+              [class]="
+                selected() === c.slug
+                  ? 'border-brand bg-brand text-white'
+                  : 'border-line bg-white text-ink-soft hover:border-brand hover:text-brand'
+              "
+            >
+              {{ c.name }} <span class="text-xs opacity-70">{{ c.productCount }}</span>
+            </a>
+          </li>
+        }
+      }
+    </ul>
+  </nav>
+
+  <div class="mt-10" aria-live="polite" [attr.aria-busy]="state() === 'loading'">
+    @switch (state()) {
+      @case ('loading') {
+        <span class="sr-only">Carregando produtos…</span>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+            <app-card-skeleton />
+          }
+        </div>
+      }
+      @case ('error') {
+        <app-state-message
+          kind="error"
+          title="Não foi possível carregar os produtos"
+          message="Verifique sua conexão e tente novamente."
+          (retry)="load(selected())"
+        />
+      }
+      @case ('notfound') {
+        <app-state-message
+          title="Categoria não encontrada"
+          message="Ela pode ter sido renomeada ou removida."
+        >
+          <a routerLink="/produtos" class="btn-primary mt-6">Ver todos os produtos</a>
+        </app-state-message>
+      }
+      @default {
+        @if (products().length) {
+          <p class="mb-6 text-sm text-ink-soft">
+            {{ products().length }} {{ products().length === 1 ? 'produto' : 'produtos' }}
+          </p>
+          <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            @for (p of products(); track p.id; let i = $index) {
+              <li><app-product-card [product]="p" [priority]="i < 3" /></li>
+            }
+          </ul>
+        } @else {
+          <app-state-message
+            title="Nenhum produto por aqui ainda"
+            message="Novos produtos aparecerão nesta página assim que forem cadastrados."
+          />
+        }
+      }
+    }
+  </div>
+</section>

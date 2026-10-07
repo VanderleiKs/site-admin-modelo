@@ -1,0 +1,17 @@
+@if (store.settings()) {
+  <app-site-header />
+  <main id="conteudo" class="flex-1" tabindex="-1">
+    <router-outlet />
+  </main>
+  <app-site-footer />
+} @else {
+  <main class="flex flex-1 items-center justify-center p-8 text-center">
+    <div class="max-w-md">
+      <h1 class="text-3xl font-semibold text-brand">Site temporariamente indisponível</h1>
+      <p class="mt-4 text-ink-soft">
+        Estamos com uma instabilidade momentânea. Por favor, tente novamente em alguns minutos.
+      </p>
+      <a href="/" class="btn-primary mt-8">Tentar novamente</a>
+    </div>
+  </main>
+}

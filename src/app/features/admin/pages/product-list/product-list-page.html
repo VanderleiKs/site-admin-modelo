@@ -1,0 +1,126 @@
+<header class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 class="font-sans text-2xl font-semibold">Produtos</h1>
+    <p class="mt-1 text-sm text-stone-600">
+      {{ rows().length }} {{ rows().length === 1 ? 'produto' : 'produtos' }}
+    </p>
+  </div>
+  <a routerLink="/admin/produtos/novo" class="adm-btn-primary"
+    ><app-icon name="plus" [size]="16" /> Novo produto</a
+  >
+</header>
+
+<div class="adm-card mt-6 grid gap-3 p-4 sm:grid-cols-[1fr_16rem]">
+  <div>
+    <label for="busca" class="sr-only">Pesquisar por nome</label>
+    <input
+      id="busca"
+      type="search"
+      class="adm-input"
+      placeholder="Pesquisar por nome…"
+      [formControl]="search"
+    />
+  </div>
+  <div>
+    <label for="filtro-categoria" class="sr-only">Categoria</label>
+    <select id="filtro-categoria" class="adm-input" [formControl]="categoryId">
+      <option value="">Todas as categorias</option>
+      @for (category of categories(); track category.id) {
+        <option [value]="category.id">{{ category.name }}</option>
+      }
+    </select>
+  </div>
+</div>
+
+<section class="adm-card mt-4 overflow-hidden" aria-live="polite" [attr.aria-busy]="loading()">
+  @if (error()) {
+    <div class="p-6 text-sm text-red-700" role="alert">
+      {{ error() }}
+      <button type="button" class="ml-2 underline" (click)="reload()">Tentar novamente</button>
+    </div>
+  } @else if (loading() && !rows().length) {
+    <p class="p-6 text-sm text-stone-600">Carregando…</p>
+  } @else if (!rows().length) {
+    <div class="p-10 text-center">
+      <p class="font-medium">Nenhum produto encontrado.</p>
+      <a routerLink="/admin/produtos/novo" class="adm-btn-primary mt-4">Cadastrar produto</a>
+    </div>
+  } @else {
+    <ul class="divide-y divide-stone-100">
+      @for (row of rows(); track row.product.id) {
+        @let product = row.product;
+        <li class="flex flex-wrap items-center gap-4 px-4 py-3 sm:flex-nowrap">
+          <div class="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-stone-100">
+            @if (product.mainImage; as image) {
+              <img
+                [src]="image.url"
+                alt=""
+                class="h-full w-full object-cover"
+                loading="lazy"
+                width="56"
+                height="56"
+              />
+            } @else {
+              <span class="flex h-full items-center justify-center text-stone-400"
+                ><app-icon name="image"
+              /></span>
+            }
+          </div>
+          <div class="min-w-0 flex-1">
+            <a
+              [routerLink]="['/admin/produtos', product.id]"
+              class="block truncate font-medium hover:underline"
+              >{{ product.name }}</a
+            >
+            <p class="truncate text-xs text-stone-600">{{ row.details }}</p>
+          </div>
+          <div class="flex items-center gap-1">
+            <button
+              type="button"
+              class="rounded-lg p-2 hover:bg-stone-100"
+              [class]="product.featured ? 'text-amber-500' : 'text-stone-400'"
+              [attr.aria-pressed]="product.featured"
+              [disabled]="busy()"
+              (click)="toggle(product, 'featured')"
+            >
+              <span class="sr-only">Destaque: {{ product.name }}</span>
+              <app-icon name="star" [size]="20" />
+            </button>
+            <label
+              class="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"
+            >
+              <input
+                type="checkbox"
+                class="peer sr-only"
+                [checked]="product.active"
+                [disabled]="busy()"
+                (change)="toggle(product, 'active')"
+              />
+              <span
+                class="relative h-5 w-9 rounded-full bg-stone-300 transition peer-checked:bg-emerald-700 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-700 after:absolute after:top-0.5 after:left-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition peer-checked:after:translate-x-4"
+              ></span>
+              <span class="w-12">{{ product.active ? 'Ativo' : 'Inativo' }}</span>
+              <span class="sr-only">: {{ product.name }}</span>
+            </label>
+            <a
+              [routerLink]="['/admin/produtos', product.id]"
+              class="rounded-lg p-2 text-stone-600 hover:bg-stone-100"
+            >
+              <span class="sr-only">Editar {{ product.name }}</span
+              ><app-icon name="edit" [size]="18" />
+            </a>
+            <button
+              type="button"
+              class="rounded-lg p-2 text-stone-600 hover:bg-red-50 hover:text-red-700"
+              [disabled]="busy()"
+              (click)="remove(product)"
+            >
+              <span class="sr-only">Excluir {{ product.name }}</span
+              ><app-icon name="trash" [size]="18" />
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

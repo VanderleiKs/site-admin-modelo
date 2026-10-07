@@ -1,0 +1,121 @@
+<a
+  href="#admin-conteudo"
+  class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2"
+  >Pular para o conteúdo</a
+>
+<div class="lg:flex">
+  <!-- Barra superior (celular) -->
+  <div
+    class="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-stone-200 bg-white px-4 lg:hidden"
+  >
+    <span class="font-semibold">Painel</span>
+    <button
+      type="button"
+      class="adm-btn-secondary !px-2.5"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="admin-nav"
+      (click)="toggleMenu()"
+    >
+      <span class="sr-only">Menu</span><app-icon [name]="menuOpen() ? 'close' : 'menu'" />
+    </button>
+  </div>
+
+  <aside
+    id="admin-nav"
+    class="fixed inset-y-0 left-0 z-40 w-64 flex-col border-r border-stone-200 bg-white lg:sticky lg:top-0 lg:flex lg:h-dvh"
+    [class.flex]="menuOpen()"
+    [class.hidden]="!menuOpen()"
+  >
+    <div class="flex h-16 items-center gap-2 border-b border-stone-200 px-5">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-800 text-white"
+        ><app-icon name="grid" [size]="16"
+      /></span>
+      <span class="font-semibold">Painel do site</span>
+    </div>
+    <nav class="flex-1 space-y-1 p-3" aria-label="Menu do painel">
+      @for (item of nav; track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="bg-emerald-50 text-emerald-900"
+          [routerLinkActiveOptions]="{ exact: item.exact }"
+          ariaCurrentWhenActive="page"
+          class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+        >
+          <app-icon [name]="item.icon" [size]="18" /> {{ item.label }}
+        </a>
+      }
+      <a
+        href="/"
+        target="_blank"
+        rel="noopener"
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-100"
+      >
+        <app-icon name="external" [size]="18" /> Ver site
+      </a>
+    </nav>
+    <div class="border-t border-stone-200 p-4">
+      <p class="truncate text-sm font-medium">{{ auth.user()?.name }}</p>
+      <p class="truncate text-xs text-stone-600">{{ auth.user()?.email }}</p>
+      <button type="button" class="adm-btn-secondary mt-3 w-full" (click)="logout()">
+        <app-icon name="logout" [size]="16" /> Sair
+      </button>
+    </div>
+  </aside>
+  @if (menuOpen()) {
+    <div
+      class="fixed inset-0 z-30 bg-black/30 lg:hidden"
+      (click)="menuOpen.set(false)"
+      aria-hidden="true"
+    ></div>
+  }
+
+  <main id="admin-conteudo" class="min-w-0 flex-1 p-4 sm:p-6 lg:p-10" tabindex="-1">
+    <router-outlet />
+  </main>
+</div>
+
+<!-- Notificações -->
+<div
+  class="pointer-events-none fixed right-4 bottom-4 z-50 flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2"
+  aria-live="polite"
+>
+  @for (t of toasts.toasts(); track t.id) {
+    <div
+      role="status"
+      class="pointer-events-auto flex items-start gap-3 rounded-lg border px-4 py-3 text-sm shadow-lg"
+      [class]="
+        t.kind === 'error'
+          ? 'border-red-200 bg-red-50 text-red-800'
+          : 'border-emerald-200 bg-emerald-50 text-emerald-900'
+      "
+    >
+      <span class="flex-1">{{ t.text }}</span>
+      <button type="button" class="opacity-60 hover:opacity-100" (click)="toasts.dismiss(t.id)">
+        <span class="sr-only">Fechar</span><app-icon name="close" [size]="16" />
+      </button>
+    </div>
+  }
+</div>
+
+<!-- Confirmação -->
+<dialog
+  #dialog
+  class="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-xl p-0 shadow-2xl backdrop:bg-black/40"
+  (cancel)="confirm.answer(false)"
+  aria-labelledby="confirm-title"
+>
+  @if (confirm.request(); as c) {
+    <div class="p-6">
+      <h2 id="confirm-title" class="text-lg font-semibold">{{ c.title }}</h2>
+      <p class="mt-2 text-sm text-stone-600">{{ c.message }}</p>
+      <div class="mt-6 flex justify-end gap-2">
+        <button type="button" class="adm-btn-secondary" (click)="confirm.answer(false)">
+          Cancelar
+        </button>
+        <button type="button" class="adm-btn-danger" (click)="confirm.answer(true)">
+          {{ c.confirmLabel }}
+        </button>
+      </div>
+    </div>
+  }
+</dialog>
