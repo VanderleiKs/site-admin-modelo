@@ -1,4 +1,4 @@
-{
+/* {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "site-admin-modelo",
   "compatibility_date": "2026-10-07",
@@ -8,5 +8,21 @@
     "directory": "dist/site-ssr/browser/",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application"
+  }
+} */
+
+
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "site-admin-modelo",
+  "main": "dist/site-ssr/server/index.mjs",
+  "compatibility_date": "2026-10-06",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "dist/site-ssr/browser"
+  },
+  "observability": {
+    "enabled": true
   }
 }
